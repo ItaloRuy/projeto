@@ -1,14 +1,32 @@
 import numpy as np
 import cv2
 
+def resizetoProcess(img):
+    width = int(img.shape[1])
+    height = int(img.shape[0])
+    ratio = height / width
 
-path = "C:\\Users\\User\\Desktop\\teste"
-image = "teste.tif"
+    new_width = 500
+    new_high = int(ratio * new_width)
+    dsize = (new_width, new_high)
+    return cv2.resize(img, dsize, interpolation=cv2.INTER_AREA)
+
+#path = "C:\\Users\\User\\Desktop\\teste"
+#image = "teste.tif"
+
 
 # le e divide as imagens em um vetor de 4 posicoes
-image = cv2.imreadmulti("C:\\Users\\User\\Desktop\\teste\\teste.tif")
+image = cv2.imreadmulti("C:\\Users\\User\\Desktop\\teste\\completo\\completo.tif")
 #extrai as imagens em um vetor
 b1, b2, b3, b4 = [x for x in image[1]]
+
+
+#equaliza imagens
+
+cv2.equalizeHist(b1)
+cv2.equalizeHist(b2)
+cv2.equalizeHist(b3)
+cv2.equalizeHist(b4)
 
     # Recorta as imagens para que se encaixem
 
@@ -18,28 +36,75 @@ b4 = b4[45:, 5:]
 
     # Recorta as imagens para todas terem o mesmo tamanho
 
-b1 = b1[:971, :1100]
+b1 = b1[0:900, 120:650]
+b2 = b2[0:900, 120:650]
+b3 = b3[0:900, 120:650]
+b4= b4[0:900, 120:650]
+
+
+img = b1[:971, :1100]
 b2 = b2[:971, :1100]
 b3 = b3[:971, :1100]
 b4 = b4[:971, :1100]
+
+cv2.imshow('GoldenGate',img)
+#salva as imagens separadas na pasta
+
+cv2.imwrite("C:\\Users\\User\\Desktop\\teste\\completo\\Green.png", b1)
+cv2.imwrite("C:\\Users\\User\\Desktop\\teste\\completo\\Red.png", b2)
+cv2.imwrite("C:\\Users\\User\\Desktop\\teste\\completo\\R.edge.png", b3)
+cv2.imwrite("C:\\Users\\User\\Desktop\\teste\\completo\\N.infrared.png", b4)
+
+#Mostra imagens
+#cv2.imshow("Green 1", b1)
+#cv2.imshow("Red 2", b2)
+#cv2.imshow("RedEdge 3", b3)
+#cv2.imshow("NearInfra 4", b4)
+
+#Sobrepoe imagens
+
+h, w = b1.shape[:2]
+newImg = np.zeros((h, w, 3), np.uint8)
+newImg[:, :, 0] = b2
+newImg[:, :, 1] = b3
+newImg[:, :, 2] = b4
+#cv2.imwrite("C:\\Users\\User\\Desktop\\teste\\completo\\b2b3b4.png", newImg)
+#cv2.imshow('b2b3b4sobrepoe', newImg)
+
+h, w = b1.shape[:2]
+newImg = np.zeros((h, w, 3), np.uint8)
+newImg[:, :, 0] = b3
+newImg[:, :, 1] = b4
+newImg[:, :, 2] = b2
+#cv2.imwrite("C:\\Users\\User\\Desktop\\teste\\completo\\b3b4b2.png", newImg)
+#cv2.imshow('b3b4b2', newImg)
+
+h, w = b1.shape[:2]
+newImg = np.zeros((h, w, 3), np.uint8)
+newImg[:, :, 0] = b4
+newImg[:, :, 1] = b3
+newImg[:, :, 2] = b2
+#cv2.imwrite("C:\\Users\\User\\Desktop\\teste\\completo\\b4b3b2.png", newImg)
+#cv2.imshow('b4b3b2sobrepoe', newImg)
 
 h, w = b1.shape[:2]
 newImg = np.zeros((h, w, 3), np.uint8)
 newImg[:, :, 0] = b2
 newImg[:, :, 1] = b1
-newImg[:, :, 2] = b4
+newImg[:, :, 2] = b1
 cv2.imshow('b1b2b4sobrepoe', newImg)
 
-
+'''
+cv2.imwrite("C:\\Users\\User\\Desktop\\teste\\completo\\Green.png", newImg)
 #b1copy = b1.copy()
 h2,w2 = b1.shape[:2]
 imFolha = np.zeros((h2,w2),np.uint8)
 for i in range(h2):
     for j in range(w2):
-        if(b1[i,j]>=120 and b1[i,j]<=200 and b2[i,j]>=90
-            and b2[i,j]<=110 and b3[i,j]>=130 and b3[i,j]<=210
-                and b4[i,j]>=140 and b4[i,j]<=210):
-                imFolha[i,j] = 255
+        if(b1[i,j]>=96 and b1[i,j]<=241 and b2[i,j]>=123
+            and b2[i,j]<=226 and b3[i,j]>=160 and b3[i,j]<=221
+                and b4[i,j]>=119 and b4[i,j]<=226):
+            imFolha[i,j] = 255
 kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3,3))
 imFolha = cv2.dilate(imFolha,kernel, iterations=1)
 
@@ -57,11 +122,6 @@ cv2.imshow("so folhas..", newImg)
 #cv2.imshow("banda 2", b2)
 #cv2.imshow("banda 3", b3)
 #cv2.imshow("banda 4", b4)
-
-# Salva imagens
-#cv2.imwrite("banda1.png", b1)
-#cv2.imwrite("banda2.png", b2)
-#cv2.imwrite("banda3.png", b3)
-#cv2.imwrite("banda4.png", b4)
+'''
 cv2.waitKey(0)
 cv2.destroyAllWindows()
